@@ -14,6 +14,16 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#write.
+    def visitWrite(self, ctx:ExprParser.WriteContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#setequals.
+    def visitSetequals(self, ctx:ExprParser.SetequalsContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#div.
     def visitDiv(self, ctx:ExprParser.DivContext):
         return self.visitChildren(ctx)

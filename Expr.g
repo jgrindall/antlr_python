@@ -1,6 +1,11 @@
 grammar Expr;
 
-root: expr EOF;
+root: action+ EOF;
+
+action:
+    WRITE NAME #write
+    | NAME SETEQUALS expr #setequals
+    ;
 
 expr:
     expr DIV expr #div
@@ -15,4 +20,7 @@ PLUS: '+';
 SUB: '-';
 DIV: '/';
 MULT: '*';
+WRITE: 'write';
+NAME : [a-z]+;
+SETEQUALS : ':=';
 WS: [ \n] -> skip;

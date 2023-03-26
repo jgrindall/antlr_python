@@ -4,7 +4,12 @@ from ExprLexer import ExprLexer
 from ExprParser import ExprParser
 from EvalVisitor import EvalVisitor
 
-input_stream = InputStream(input('? '))
+code = """
+a := 101
+write a
+"""
+
+input_stream = InputStream(code)
 
 lexer = ExprLexer(input_stream)
 token_stream = CommonTokenStream(lexer)
@@ -13,3 +18,4 @@ tree = parser.root()
 
 visitor = EvalVisitor()
 visitor.visit(tree)
+

@@ -8,10 +8,14 @@ else:
     
     
 class EvalVisitor(ExprVisitor):
-    
+
+    def __init__(self):
+        self._varMap = {}
+
     def visitRoot(self,ctx):
         l = list(ctx.getChildren())
-        print(self.visit(l[0]))
+        for child in l:
+            self.visit(child)
    
     def visitDiv(self, ctx:ExprParser.DivContext):
         l = list(ctx.getChildren())
@@ -39,5 +43,19 @@ class EvalVisitor(ExprVisitor):
     def visitNum(self, ctx:ExprParser.NumContext):
         l = list(ctx.getChildren())
         return int(l[0].getText())
+        
+    def visitSetequals(self, ctx:ExprParser.SetequalsContext):
+        l = list(ctx.getChildren())
+        name = l[0].getText()
+        value = self.visit(l[2])
+        self._varMap[name] = value
+        
+    
+    def visitWrite(self, ctx:ExprParser.WriteContext):
+        l = list(ctx.getChildren())
+        name = l[1].getText()
+        print(self._varMap[name])
+        
+        
         
         

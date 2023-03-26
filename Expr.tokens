@@ -3,8 +3,13 @@ PLUS=2
 SUB=3
 DIV=4
 MULT=5
-WS=6
+WRITE=6
+NAME=7
+SETEQUALS=8
+WS=9
 '+'=2
 '-'=3
 '/'=4
 '*'=5
+'write'=6
+':='=8
