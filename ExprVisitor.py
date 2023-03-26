@@ -14,8 +14,28 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#expr.
-    def visitExpr(self, ctx:ExprParser.ExprContext):
+    # Visit a parse tree produced by ExprParser#div.
+    def visitDiv(self, ctx:ExprParser.DivContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#add.
+    def visitAdd(self, ctx:ExprParser.AddContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#sub.
+    def visitSub(self, ctx:ExprParser.SubContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#mult.
+    def visitMult(self, ctx:ExprParser.MultContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#num.
+    def visitNum(self, ctx:ExprParser.NumContext):
         return self.visitChildren(ctx)
 
 
