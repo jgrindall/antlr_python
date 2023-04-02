@@ -47,7 +47,29 @@ class EvalVisitor(ExprVisitor):
     def visitNum(self, ctx:ExprParser.NumContext):
         l = list(ctx.getChildren())
         return int(l[0].getText())
+
+    def visitNameval(self, ctx:ExprParser.NamevalContext):
+        l = list(ctx.getChildren())
+        name = l[0].getText()
+        return self._varMap[name]
         
+    def visitNext(self, ctx:ExprParser.NextContext):
+        l = list(ctx.getChildren())
+        val = self.visit(l[1])
+        print("next", val + 1)
+
+
+    def visitWhileloop(self, ctx:ExprParser.WhileloopContext):
+        #WHILE boolexpr action+ #whileloop
+        l = list(ctx.getChildren())
+        children = l[2:]
+        def shouldLoop():
+            val = self.visit(l[1])
+            return val 
+        while shouldLoop():
+             for child in children:
+                self.visit(child)
+
     def visitSetequals(self, ctx:ExprParser.SetequalsContext):
         l = list(ctx.getChildren())
         name = l[0].getText()
@@ -72,9 +94,7 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         boolVal = self.visit(l[1])
         text = list(map(lambda x : x.getText(), l))
-        print("text", text)
         indexOfElse = text.index("else")
-        print("indexOfElse", indexOfElse)
         if boolVal:
             for child in l[2:indexOfElse]:
                 self.visit(child)

@@ -4,17 +4,17 @@ from ExprLexer import ExprLexer
 from ExprParser import ExprParser
 from EvalVisitor import EvalVisitor
 
-code = """a := 439 + 3 ^ 2 ^ 3
+code = """a := 90
 b := 8
 c := 1
 write a
-if 900 < 7000
-write a
 write b
-else
 write c
+while c <= a
 write c
-write c
+write a  
+c := c * 2
+a := a - 1
 """
 
 input_stream = InputStream(code)

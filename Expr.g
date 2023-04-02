@@ -3,10 +3,12 @@ grammar Expr;
 root: action+ EOF;
 
 action:
-    WRITE NAME #write
+    WRITE expr #write
+    | NEXT expr #next
     | NAME SETEQUALS expr #setequals
     | IF boolexpr action+ #if
     | IF boolexpr action+ ELSE action+ #ifelse
+    | WHILE boolexpr action+ #whileloop
     ;
 
 expr:
@@ -15,16 +17,20 @@ expr:
     | expr MULT expr #mult
     | expr PLUS expr #add
     | expr SUB expr #sub
+    | NAME #nameval
     | NUM #num
     ;
 
 boolexpr:
     expr LESS_THAN expr
     | expr GREATER_THAN expr
+    | expr EQUALS expr
     ;
 
-
+EQUALS: '==';
+WHILE: 'while';
 LESS_THAN: '<';
+NEXT: 'next';
 GREATER_THAN: '>';
 IF: 'if';
 ELSE: 'else';

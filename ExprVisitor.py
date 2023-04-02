@@ -19,6 +19,11 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#next.
+    def visitNext(self, ctx:ExprParser.NextContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#setequals.
     def visitSetequals(self, ctx:ExprParser.SetequalsContext):
         return self.visitChildren(ctx)
@@ -31,6 +36,11 @@ class ExprVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ExprParser#ifelse.
     def visitIfelse(self, ctx:ExprParser.IfelseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#whileloop.
+    def visitWhileloop(self, ctx:ExprParser.WhileloopContext):
         return self.visitChildren(ctx)
 
 
@@ -51,6 +61,11 @@ class ExprVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ExprParser#mult.
     def visitMult(self, ctx:ExprParser.MultContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#nameval.
+    def visitNameval(self, ctx:ExprParser.NamevalContext):
         return self.visitChildren(ctx)
 
 
