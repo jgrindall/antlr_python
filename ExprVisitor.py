@@ -24,6 +24,16 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#if.
+    def visitIf(self, ctx:ExprParser.IfContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#ifelse.
+    def visitIfelse(self, ctx:ExprParser.IfelseContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#div.
     def visitDiv(self, ctx:ExprParser.DivContext):
         return self.visitChildren(ctx)
@@ -46,6 +56,16 @@ class ExprVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ExprParser#num.
     def visitNum(self, ctx:ExprParser.NumContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#power.
+    def visitPower(self, ctx:ExprParser.PowerContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#boolexpr.
+    def visitBoolexpr(self, ctx:ExprParser.BoolexprContext):
         return self.visitChildren(ctx)
 
 

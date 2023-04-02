@@ -11,12 +11,16 @@ class EvalVisitor(ExprVisitor):
 
     def __init__(self):
         self._varMap = {}
-
+    
     def visitRoot(self,ctx):
         l = list(ctx.getChildren())
         for child in l:
             self.visit(child)
    
+    def visitPower(self, ctx:ExprParser.PowerContext):
+        l = list(ctx.getChildren())
+        return self.visit(l[0]) ** self.visit(l[2])
+    
     def visitDiv(self, ctx:ExprParser.DivContext):
         l = list(ctx.getChildren())
         return self.visit(l[0]) / self.visit(l[2])
@@ -56,6 +60,35 @@ class EvalVisitor(ExprVisitor):
         name = l[1].getText()
         print(self._varMap[name])
         
+
+    def visitIf(self, ctx:ExprParser.IfContext):
+        l = list(ctx.getChildren())
+        boolVal = self.visit(l[1])
+        if boolVal:
+            for child in l[2:]:
+                self.visit(child)
+
+    def visitIfelse(self, ctx:ExprParser.IfelseContext):
+        l = list(ctx.getChildren())
+        boolVal = self.visit(l[1])
+        text = list(map(lambda x : x.getText(), l))
+        print("text", text)
+        indexOfElse = text.index("else")
+        print("indexOfElse", indexOfElse)
+        if boolVal:
+            for child in l[2:indexOfElse]:
+                self.visit(child)
+        else:
+            for child in l[indexOfElse + 1:]:
+                self.visit(child)
+
+    def visitBoolexpr(self, ctx:ExprParser.BoolexprContext):
+        l = list(ctx.getChildren())
+        val0 = self.visit(l[0])
+        val2 = self.visit(l[2])
+        lessThan = l[1].getText() == '<'
+        return val0 < val2 if lessThan else val0 > val2
+
         
         
         
