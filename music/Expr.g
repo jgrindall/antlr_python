@@ -1,15 +1,45 @@
 grammar Expr;
 
-root: action+ EOF;
+root: proc_def+ EOF;
 
-action:
-    WRITE expr #write
-    | NEXT expr #next
-    | NAME SETEQUALS expr #setequals
-    | IF boolexpr action+ #if
-    | IF boolexpr action+ ELSE action+ #ifelse
-    | WHILE boolexpr action+ #whileloop
-    ;
+proc_def: PROC_NAME args_list OPEN instructions CLOSE;
+
+proc_call: PROC_NAME expr_list;
+
+expr_list: expr (SPACE expr)*;
+
+args_list: VAR_NAME (SPACE VAR_NAME)*;
+
+instructions: instruction*;
+
+instruction: assign
+            | input
+            | output
+            | play
+            | proc_call
+            | if_else
+            | while_
+            | append
+            | cut
+            ;
+
+assign: VAR_NAME SETEQUALS expr;
+
+input: PROMPT VAR_NAME;
+
+output: WRITE expr;
+
+play: PLAY expr;
+
+if_else: IF expr OPEN instructions CLOSE (ELSE OPEN instructions CLOSE)?;
+
+while_: WHILE expr OPEN instructions CLOSE;
+
+append: VAR_NAME APPEND expr;
+
+cut: CUT VAR_NAME '[' expr ']';
+
+list_: L_BRACE expr* R_BRACE;
 
 expr:
     <assoc=right> expr POWER expr #power
@@ -17,20 +47,34 @@ expr:
     | expr MULT expr #mult
     | expr PLUS expr #add
     | expr SUB expr #sub
-    | NAME #nameval
+    | '(' expr ')' #bracketed
+    | VAR_NAME #nameval
+    | list_ #listval
+    | list_count #count
+    | list_index #index    
+    | expr LESS_THAN expr #lt
+    | expr GREATER_THAN expr #gt
+    | expr EQUALS expr #equals
     | NUM #num
+    | NOTE_NAME #notename 
+    | STRING #string
     ;
 
-boolexpr:
-    expr LESS_THAN expr
-    | expr GREATER_THAN expr
-    | expr EQUALS expr
-    ;
+list_count: '#' VAR_NAME;
 
-EQUALS: '==';
+list_index: (VAR_NAME | list_) '[' expr ']' ;
+
+STRING: '"' [a-zA-Z]* '"';
+VAR_NAME: [a-z]+;
+OPEN: '|:';
+CLOSE: ':|';
+PLAY: '(:)';
+SPACE: ' ';
+PROC_NAME:[A-Z][a-zA-Z]*;
+EQUALS: '=';
+SETEQUALS:'<-';
 WHILE: 'while';
 LESS_THAN: '<';
-NEXT: 'next';
 GREATER_THAN: '>';
 IF: 'if';
 ELSE: 'else';
@@ -40,7 +84,11 @@ SUB: '-';
 POWER: '^';
 DIV: '/';
 MULT: '*';
-WRITE: 'write';
-NAME : [a-z]+;
-SETEQUALS : ':=';
+WRITE: '<w>';
+PROMPT: '<?>';
+L_BRACE: '{';
+R_BRACE: '}';
+CUT: '8<';
+APPEND: '<<';
 WS: [ \n] -> skip;
+NOTE_NAME: [A-G][0-9]?;
