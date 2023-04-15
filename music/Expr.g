@@ -1,6 +1,6 @@
 grammar Expr;
 
-root: proc_def+ instructions EOF;
+root: proc_def* instructions EOF;
 
 proc_def: PROC_NAME args_list? OPEN instructions CLOSE;
 
@@ -12,13 +12,14 @@ args_list: VAR_NAME (COMMA VAR_NAME)*;
 
 instructions: instruction*;
 
-instruction: assign
+instruction: 
+            while_
+            | if_else
+            | assign
             | input
             | output
             | play
             | proc_call
-            | if_else
-            | while_
             | append
             | cut
             ;
@@ -60,18 +61,22 @@ expr:
     | STRING #string
     ;
 
-STRING: '"' [a-zA-Z]* '"';
-VAR_NAME: [a-z]+;
+WHILE: 'while';
+PLAY: '(:)';
 OPEN: '|:';
 CLOSE: ':|';
-PLAY: '(:)';
+WRITE: '<w>';
+PROMPT: '<?>';
+CUT: '8<';
+APPEND: '<<';
+SETEQUALS:'<-';
+LESS_THAN: '<';
+GREATER_THAN: '>';
+STRING: '"' [a-zA-Z]* '"';
+VAR_NAME: [a-z]+;
 COMMA: ',';
 PROC_NAME:[A-Z][a-zA-Z_]*;
 EQUALS: '=';
-SETEQUALS:'<-';
-WHILE: 'while';
-LESS_THAN: '<';
-GREATER_THAN: '>';
 IF: 'if';
 ELSE: 'else';
 NUM: [0-9]+;
@@ -80,12 +85,7 @@ SUB: '-';
 POWER: '^';
 DIV: '/';
 MULT: '*';
-WRITE: '<w>';
-PROMPT: '<?>';
 L_BRACE: '{';
 R_BRACE: '}';
-CUT: '8<';
-APPEND: '<<';
 NOTE_NAME: [A-G][0-9]?;
-
 WHITESPACE : [ \t\r\n]+ -> skip ;

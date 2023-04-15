@@ -12,9 +12,10 @@ notes_scale = ["A", "B", "C", "D", "E", "F", "G"]
 notes_numbers = range(0, 10)
 for i in notes_numbers:
     for j in notes_scale:
-        notes_map[str(i) + str(j)] = val   
+        notes_map[str(j) + str(i)] = val   
         val += 1
 
+notes_map_swapped = {v: k for k, v in notes_map.items()}
 class EvalVisitor(ExprVisitor):
 
     def __init__(self):
@@ -26,6 +27,12 @@ class EvalVisitor(ExprVisitor):
     @property
     def notes(self):
         return self._notes
+    
+    def lookup_note_name(self, i):
+        if i in notes_map_swapped:
+            return notes_map_swapped[i]
+        else:
+            raise "no note with value " + i
     
     @property
     def current_scope(self):
@@ -44,6 +51,7 @@ class EvalVisitor(ExprVisitor):
         if val2 == "|:":
             # a function with params
             param_names = self.visit(l[1])
+            print("param_names", param_names)
             instructions_node = l[3]
         else:
             # a function with no params
@@ -60,32 +68,35 @@ class EvalVisitor(ExprVisitor):
     def visitProc_call(self, ctx:ExprParser.Proc_callContext):
         l = list(ctx.getChildren())
         proc_name = l[0].getText()
-        proc =  self._procedures[proc_name]
-        #make a new stack
-        stack = {}
-        self._stack.append(stack)
-        if len(l) == 2:
-            #with args
-            values = self.visit(l[1])
-            #get all the values
-            param_names = proc["param_names"]
-            for name, i in param_names:
-                stack[name] = values[i]
+        if proc_name in self._procedures:
+            proc =  self._procedures[proc_name]
+            #make a new stack
+            stack = {}
+            self._stack.append(stack)
+            if len(l) == 2:
+                #with args
+                values = self.visit(l[1])
+                #get all the values
+                param_names = proc["param_names"]
+                for name, i in param_names:
+                    stack[name] = values[i]
 
-        self.visit(proc["instructions_node"])
+            self.visit(proc["instructions_node"])
         
+        else:
+            raise "no proc called " + proc_name
 
     # Visit a parse tree produced by ExprParser#expr_list.
     def visitExpr_list(self, ctx:ExprParser.Expr_listContext):
         l = list(ctx.getChildren())
         values = l[0::2]
-        return map(lambda child: self.visit(child), values)
+        return list(map(lambda child: self.visit(child), values))
 
     # Visit a parse tree produced by ExprParser#args_list.
     def visitArgs_list(self, ctx:ExprParser.Args_listContext):
         l = list(ctx.getChildren())
         values = l[0::2]
-        return map(lambda child: child.getText(), values)
+        return list(map(lambda child: child.getText(), values))
 
     # Visit a parse tree produced by ExprParser#assign.
     def visitAssign(self, ctx:ExprParser.AssignContext):
@@ -113,8 +124,9 @@ class EvalVisitor(ExprVisitor):
     # Visit a parse tree produced by ExprParser#play.
     def visitPlay(self, ctx:ExprParser.PlayContext):
         #play: PLAY expr;
+        l = list(ctx.getChildren())
         val = self.visit(l[1])
-        print("play lookup for ", val)
+        self._notes.append(self.lookup_note_name(val))
 
 
     # Visit a parse tree produced by ExprParser#if_else.
@@ -182,7 +194,7 @@ class EvalVisitor(ExprVisitor):
     # Visit a parse tree produced by ExprParser#num.
     def visitNum(self, ctx:ExprParser.NumContext):
         l = list(ctx.getChildren())
-        return float(l[1].getText())
+        return float(l[0].getText())
 
 
     # Visit a parse tree produced by ExprParser#count.
@@ -231,7 +243,11 @@ class EvalVisitor(ExprVisitor):
     def visitNotename(self, ctx:ExprParser.NotenameContext):
         #NOTE_NAME: [A-G][0-9]?;
         l = list(ctx.getChildren())
-        return notes_map[l[0].getText()]
+        key = l[0].getText()
+        if key in notes_map:
+            return notes_map[key]
+        else:
+            raise "No note called " + key
 
 
     # Visit a parse tree produced by ExprParser#nameval.
