@@ -1,14 +1,14 @@
 grammar Expr;
 
-root: proc_def+ EOF;
+root: proc_def+ instructions EOF;
 
-proc_def: PROC_NAME args_list OPEN instructions CLOSE;
+proc_def: PROC_NAME args_list? OPEN instructions CLOSE;
 
-proc_call: PROC_NAME expr_list;
+proc_call: PROC_NAME expr_list?;
 
-expr_list: expr (SPACE expr)*;
+expr_list: expr (COMMA expr)*;
 
-args_list: VAR_NAME (SPACE VAR_NAME)*;
+args_list: VAR_NAME (COMMA VAR_NAME)*;
 
 instructions: instruction*;
 
@@ -50,8 +50,8 @@ expr:
     | '(' expr ')' #bracketed
     | VAR_NAME #nameval
     | list_ #listval
-    | list_count #count
-    | list_index #index    
+    | '#' VAR_NAME #count
+    | (VAR_NAME | list_) '[' expr ']' #index    
     | expr LESS_THAN expr #lt
     | expr GREATER_THAN expr #gt
     | expr EQUALS expr #equals
@@ -60,17 +60,13 @@ expr:
     | STRING #string
     ;
 
-list_count: '#' VAR_NAME;
-
-list_index: (VAR_NAME | list_) '[' expr ']' ;
-
 STRING: '"' [a-zA-Z]* '"';
 VAR_NAME: [a-z]+;
 OPEN: '|:';
 CLOSE: ':|';
 PLAY: '(:)';
-SPACE: ' ';
-PROC_NAME:[A-Z][a-zA-Z]*;
+COMMA: ',';
+PROC_NAME:[A-Z][a-zA-Z_]*;
 EQUALS: '=';
 SETEQUALS:'<-';
 WHILE: 'while';
@@ -90,5 +86,6 @@ L_BRACE: '{';
 R_BRACE: '}';
 CUT: '8<';
 APPEND: '<<';
-WS: [ \n] -> skip;
 NOTE_NAME: [A-G][0-9]?;
+
+WHITESPACE : [ \t\r\n]+ -> skip ;

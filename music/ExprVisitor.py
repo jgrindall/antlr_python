@@ -169,15 +169,5 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#list_count.
-    def visitList_count(self, ctx:ExprParser.List_countContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ExprParser#list_index.
-    def visitList_index(self, ctx:ExprParser.List_indexContext):
-        return self.visitChildren(ctx)
-
-
 
 del ExprParser
