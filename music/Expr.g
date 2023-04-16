@@ -62,6 +62,8 @@ expr:
     ;
 
 WHILE: 'while';
+IF: 'if';
+ELSE: 'else';
 PLAY: '(:)';
 OPEN: '|:';
 CLOSE: ':|';
@@ -75,10 +77,7 @@ GREATER_THAN: '>';
 STRING: '"' [a-zA-Z]* '"';
 VAR_NAME: [a-z]+;
 COMMA: ',';
-PROC_NAME:[A-Z][a-zA-Z_]*;
 EQUALS: '=';
-IF: 'if';
-ELSE: 'else';
 NUM: [0-9]+;
 PLUS: '+';
 SUB: '-';
@@ -88,4 +87,5 @@ MULT: '*';
 L_BRACE: '{';
 R_BRACE: '}';
 NOTE_NAME: [A-G][0-9]?;
+PROC_NAME:[A-Z][a-zA-Z_]*;
 WHITESPACE : [ \t\r\n]+ -> skip ;

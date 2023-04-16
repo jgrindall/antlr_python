@@ -22,7 +22,21 @@ class EvalVisitor(ExprVisitor):
         self._stack = []
         self._procedures = {}
         self._notes = []
+        self.make_new_stack()
 
+    #make a new stack
+    def make_new_stack(self):
+        stack = {}
+        self._stack.append(stack)
+    
+    def pop_stack(self):
+        self._stack.pop()
+
+    def set_variable(self, name, val):
+        self.current_scope[name] = val
+
+    def get_variable_value(self, name):
+        return self.current_scope[name]
 
     @property
     def notes(self):
@@ -51,7 +65,6 @@ class EvalVisitor(ExprVisitor):
         if val2 == "|:":
             # a function with params
             param_names = self.visit(l[1])
-            print("param_names", param_names)
             instructions_node = l[3]
         else:
             # a function with no params
@@ -70,18 +83,16 @@ class EvalVisitor(ExprVisitor):
         proc_name = l[0].getText()
         if proc_name in self._procedures:
             proc =  self._procedures[proc_name]
-            #make a new stack
-            stack = {}
-            self._stack.append(stack)
             if len(l) == 2:
                 #with args
                 values = self.visit(l[1])
                 #get all the values
                 param_names = proc["param_names"]
-                for name, i in param_names:
-                    stack[name] = values[i]
-
+                self.make_new_stack()
+                for i, name in enumerate(param_names):
+                    self.set_variable(name, values[i])
             self.visit(proc["instructions_node"])
+            self.pop_stack()
         
         else:
             raise "no proc called " + proc_name
@@ -103,22 +114,22 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         name = l[0].getText()
         val = self.visit(l[2])
-        self.current_scope[name] = val
-
+        self.set_variable(name, val)
+        
     # Visit a parse tree produced by ExprParser#input.
     def visitInput(self, ctx:ExprParser.InputContext):
         #input: PROMPT VAR_NAME;
         l = list(ctx.getChildren())
         input_val = input()
         name = l[1].getText()
-        self.current_scope[name] = input_val
+        self.set_variable(name, input_val)
 
 
     # Visit a parse tree produced by ExprParser#output.
     def visitOutput(self, ctx:ExprParser.OutputContext):
         l = list(ctx.getChildren())
         val = self.visit(l[1])
-        print("outut", val)
+        print("output", val)
 
 
     # Visit a parse tree produced by ExprParser#play.
@@ -155,17 +166,17 @@ class EvalVisitor(ExprVisitor):
         #TODO - type check
         l = list(ctx.getChildren())
         value = self.visit(l[2])
-        var_value = self.current_scope[l[0].getText()]
+        var_value = self.get_variable_value(l[0].getText())
         var_value.append(value)
-
 
     # Visit a parse tree produced by ExprParser#cut.
     def visitCut(self, ctx:ExprParser.CutContext):
         #cut: CUT VAR_NAME '[' expr ']';
         l = list(ctx.getChildren())
-        index = self.visit(l[2])
-        var_value = self.current_scope[l[1].getText()]
-        del var_value[index]
+        index = self.visit(l[3])
+        #if index is 1, we want the 0th
+        var_value = self.get_variable_value(l[1].getText())
+        del var_value[index - 1]
 
     # Visit a parse tree produced by ExprParser#add.
     def visitAdd(self, ctx:ExprParser.AddContext):
@@ -200,9 +211,10 @@ class EvalVisitor(ExprVisitor):
     # Visit a parse tree produced by ExprParser#count.
     def visitCount(self, ctx:ExprParser.CountContext):
         # TODO - type check 
+        
         l = list(ctx.getChildren())
         name = l[1].getText()
-        value = self.current_scope[name]
+        value = self.get_variable_value(name)
         return len(value)
 
 
@@ -223,8 +235,9 @@ class EvalVisitor(ExprVisitor):
             list_values = self.visit(l[0])
         else:
             #its a variable name
-            list_values = self.current_scope[l[0].getText()]
-        return list_values[index]
+            list_values = self.get_variable_value(l[0].getText())
+        #if you want index 1, it is really 0
+        return list_values[index - 1]
 
     # Visit a parse tree produced by ExprParser#gt.
     def visitGt(self, ctx:ExprParser.GtContext):
@@ -254,7 +267,7 @@ class EvalVisitor(ExprVisitor):
     def visitNameval(self, ctx:ExprParser.NamevalContext):
         l = list(ctx.getChildren())
         name = l[0].getText()
-        return self.current_scope[name]
+        return self.get_variable_value(name)
 
 
     # Visit a parse tree produced by ExprParser#equals.
@@ -263,13 +276,16 @@ class EvalVisitor(ExprVisitor):
         val = 1 if self.visit(l[0]) == self.visit(l[2])  else 0
         return val
 
-
     # Visit a parse tree produced by ExprParser#listval.
     def visitListval(self, ctx:ExprParser.ListvalContext):
         l = list(ctx.getChildren())
-        values = map(lambda child: self.visit(child), l[1:-1])
-        return list(values)
+        return self.visit(l[0])
 
+    def visitList_(self, ctx:ExprParser.List_Context):
+        l = list(ctx.getChildren())
+        values = map(lambda child: self.visit(child), l[1:-1])
+        _list = list(values) 
+        return _list
 
     # Visit a parse tree produced by ExprParser#power.
     def visitPower(self, ctx:ExprParser.PowerContext):
