@@ -154,6 +154,16 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#isnotequals.
+    def visitIsnotequals(self, ctx:ExprParser.IsnotequalsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#isequals.
+    def visitIsequals(self, ctx:ExprParser.IsequalsContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#listval.
     def visitListval(self, ctx:ExprParser.ListvalContext):
         return self.visitChildren(ctx)

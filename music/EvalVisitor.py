@@ -128,8 +128,8 @@ class EvalVisitor(ExprVisitor):
     # Visit a parse tree produced by ExprParser#output.
     def visitOutput(self, ctx:ExprParser.OutputContext):
         l = list(ctx.getChildren())
-        val = self.visit(l[1])
-        print("output", val)
+        values = list(map(lambda node: self.visit(node), l[1:]))
+        print("output:", values)
 
 
     # Visit a parse tree produced by ExprParser#play.
@@ -146,10 +146,10 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         test0 = self.visit(l[1])
         if test0 > 0:
-            self.visit(l[3])
+            self.visit(ctx.instructions(0))
         else:
             if len(l) >= 8:
-                self.visit(l[7])
+                self.visit(ctx.instructions(1))
 
     # Visit a parse tree produced by ExprParser#while_.
     def visitWhile_(self, ctx:ExprParser.While_Context):
@@ -199,8 +199,7 @@ class EvalVisitor(ExprVisitor):
     # Visit a parse tree produced by ExprParser#string.
     def visitString(self, ctx:ExprParser.StringContext):
         l = list(ctx.getChildren())
-        return l[1].getText()
-
+        return l[0].getText()
 
     # Visit a parse tree produced by ExprParser#num.
     def visitNum(self, ctx:ExprParser.NumContext):
@@ -222,6 +221,20 @@ class EvalVisitor(ExprVisitor):
     def visitLt(self, ctx:ExprParser.LtContext):
         l = list(ctx.getChildren())
         val = 1 if self.visit(l[0]) < self.visit(l[2])  else 0
+        return val
+
+
+    # Visit a parse tree produced by ExprParser#isnotequals.
+    def visitIsnotequals(self, ctx:ExprParser.IsnotequalsContext):
+        l = list(ctx.getChildren())
+        val = 1 if self.visit(l[0]) != self.visit(l[2])  else 0
+        return val
+
+
+    # Visit a parse tree produced by ExprParser#isequals.
+    def visitIsequals(self, ctx:ExprParser.IsequalsContext):
+        l = list(ctx.getChildren())
+        val = 1 if self.visit(l[0]) == self.visit(l[2])  else 0
         return val
 
 

@@ -28,7 +28,7 @@ assign: VAR_NAME SETEQUALS expr;
 
 input: PROMPT VAR_NAME;
 
-output: WRITE expr;
+output: WRITE expr+;
 
 play: PLAY expr;
 
@@ -55,6 +55,8 @@ expr:
     | (VAR_NAME | list_) '[' expr ']' #index    
     | expr LESS_THAN expr #lt
     | expr GREATER_THAN expr #gt
+    | expr IS_EQUAL expr #isequals
+    | expr IS_NOT_EQUAL expr #isnotequals
     | expr EQUALS expr #equals
     | NUM #num
     | NOTE_NAME #notename 
@@ -72,9 +74,11 @@ PROMPT: '<?>';
 CUT: '8<';
 APPEND: '<<';
 SETEQUALS:'<-';
+IS_EQUAL: '==';
+IS_NOT_EQUAL: '/=';
 LESS_THAN: '<';
 GREATER_THAN: '>';
-STRING: '"' [a-zA-Z]* '"';
+STRING: '"' [a-zA-Z0-9 ]* '"';
 VAR_NAME: [a-z]+;
 COMMA: ',';
 EQUALS: '=';

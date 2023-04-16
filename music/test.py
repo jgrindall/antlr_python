@@ -58,6 +58,7 @@ HanoiRec #src, src, dst, aux
 
 code6 = """
 HanoiRec n, src, dst, aux |:
+    <w> n src dst aux
     if n > 0 |:
         HanoiRec (n - 1), src, aux, dst
         note <- src[#src]
@@ -72,6 +73,32 @@ src <- {C2 D2 E2 F2 G2}
 dst <- {}
 aux <- {}
 HanoiRec #src, src, dst, aux
+"""
+
+code7 = """
+<w> "Their GCD is"
+"""
+
+code8 = """
+Euclides a, b |:
+:|
+"""
+
+code9 = """
+Euclides a, b |:
+    while a /= b |:
+        if a > b |:
+            (:) C2
+            a <- a - b
+        :|
+        else |:
+            (:) C4
+            b <- b - a
+        :|
+    :|
+    <w> "Their GCD is" a
+:|
+Euclides 150, 28
 """
 
 def process(prog):
@@ -96,5 +123,7 @@ def process(prog):
 #process(code3)
 #process(code4)
 #process(code5)
-process(code6)
-
+#process(code6)
+#process(code7)
+#process(code8)
+process(code9)
