@@ -137,7 +137,11 @@ class EvalVisitor(ExprVisitor):
         #play: PLAY expr;
         l = list(ctx.getChildren())
         val = self.visit(l[1])
-        self._notes.append(self.lookup_note_name(val))
+        if type(val) is list:
+            for note in val:
+                self._notes.append(self.lookup_note_name(note))
+        else:
+            self._notes.append(self.lookup_note_name(val))
 
 
     # Visit a parse tree produced by ExprParser#if_else.
